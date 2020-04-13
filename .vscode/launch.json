@@ -5,15 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(Windows) Launch",
-            "type": "cppvsdbg",
+            "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/target/debug/rusted-armor.exe",
+            "name": "Debug executable 'rusted_armor'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=rusted_armor",
+                    "--package=rusted_armor"
+                ],
+                "filter": {
+                    "name": "rusted_armor",
+                    "kind": "bin"
+                }
+            },
             "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
