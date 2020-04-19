@@ -1,14 +1,15 @@
 [package]
-name = "armored_api"
+name = "armored_apis"
 version = "0.1.0"
 authors = ["Anwar Ludin <anwar.ludin@algonents.com>"]
 edition = "2018"
 
 [dependencies]
-
+futures = "0.3.4"
+hyper = "0.13"
+hyper-reverse-proxy = "0.4.0"
 serde = "1.0.105"
 serde_derive = "1.0.105"
 serde_json = "1.0.48"
-
-hyper = "0.13"
 tokio = { version = "0.2", features = ["full"] }
+

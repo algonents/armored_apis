@@ -11,11 +11,11 @@
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=rusted_armor",
-                    "--package=rusted_armor"
+                    "--bin=armored_apis",
+                    "--package=armored_apis"
                 ],
                 "filter": {
-                    "name": "rusted_armor",
+                    "name": "armored_apis",
                     "kind": "bin"
                 }
             },
