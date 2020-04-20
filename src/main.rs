@@ -1,5 +1,6 @@
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Client, Error, Request, Response, Server, Uri};
+use std::net::SocketAddr;
 
 async fn dispatch(req: Request<Body>) -> Result<Response<Body>, Error> {
     println!(
@@ -16,31 +17,43 @@ async fn dispatch(req: Request<Body>) -> Result<Response<Body>, Error> {
     );
 
     let url: Uri = uri_string.parse().unwrap();
-    let mut response = client.get(url).await?;
+    let response = client.get(url).await?;
 
-    let body = hyper::body::to_bytes(response.body_mut()).await?;
+    Ok(response)
+}
 
-    Ok(Response::new(Body::from(body)))
+async fn run_server(addr: SocketAddr) {
+    println!("Listening on http://{}", addr);
+
+    // Create a server bound on the provided address
+    let serve_future = Server::bind(&addr)
+        // Serve requests using our `async serve_req` function.
+        // `serve` takes a closure which returns a type implementing the
+        // `Service` trait. `service_fn` returns a value implementing the
+        // `Service` trait, and accepts a closure which goes from request
+        // to a future of the response.
+        .serve(make_service_fn(|_| async {
+            {
+                Ok::<_, hyper::Error>(service_fn(dispatch))
+            }
+        }));
+
+    // Wait for the server to complete serving or exit with an error.
+    // If an error occurred, print it to stderr.
+    if let Err(e) = serve_future.await {
+        eprintln!("server error: {}", e);
+    }
 }
 
 #[tokio::main]
-pub async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+pub async fn main() {
     println!("{}", armored_apis::say_hello());
 
-    // For every connection, we must make a `Service` to handle all
-    // incoming HTTP requests on said connection.
-    let make_svc = make_service_fn(|_conn| {
-        // This is the `Service` that will handle the connection.
-        // `service_fn` is a helper to convert a function that
-        // returns a Response into a `Service`.
-        async { Ok::<_, Error>(service_fn(dispatch)) }
-    });
+    // Set the address to run our socket on.
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
 
-    let addr = ([127, 0, 0, 1], 8080).into();
-    let server = Server::bind(&addr).serve(make_svc);
-
-    println!("Listening on http://{}", addr);
-
-    server.await?;
-    Ok(())
+    // Call our `run_server` function, which returns a future.
+    // As with every `async fn`, for `run_server` to do anything,
+    // the returned future needs to be run using `await`;
+    run_server(addr).await;
 }
