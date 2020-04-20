@@ -1,3 +1,4 @@
+pub mod core;
 pub mod utils;
 
 pub fn say_hello() -> String {
