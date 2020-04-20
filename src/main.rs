@@ -2,11 +2,20 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Client, Error, Request, Response, Server, Uri};
 
 async fn dispatch(req: Request<Body>) -> Result<Response<Body>, Error> {
-    println!("{}", req.uri());
+    println!(
+        "{}",
+        req.uri().path_and_query().map(|x| x.as_str()).unwrap_or("")
+    );
 
     let client = Client::new();
 
-    let url: Uri = "http://localhost:3000/static/js/bundle.js".parse().unwrap();
+    let uri_string = format!(
+        "http://{}/{}",
+        "localhost:3000",
+        req.uri().path_and_query().map(|x| x.as_str()).unwrap_or("")
+    );
+
+    let url: Uri = uri_string.parse().unwrap();
     let mut response = client.get(url).await?;
 
     let body = hyper::body::to_bytes(response.body_mut()).await?;
