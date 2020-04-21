@@ -22,7 +22,7 @@ async fn dispatch(req: Request<Body>) -> Result<Response<Body>, Error> {
     Ok(response)
 }
 
-pub async fn run_server(addr: SocketAddr) {
+pub async fn run_gateway(addr: SocketAddr) {
     println!("Listening on http://{}", addr);
 
     // Create a server bound on the provided address
